@@ -1,3 +1,6 @@
+unreleased
+* plotCorrelation --removeOutliers: the deviation is scaled by the median absolute deviation, as documented, not by the median of |x|
+
 3.5.5
 * drop support for python 3.7
 * doc fixes (argparse properly displayed, minor changes in installation instructions)
