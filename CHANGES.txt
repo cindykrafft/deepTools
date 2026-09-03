@@ -1,3 +1,6 @@
+unreleased
+* bamCoverage/bamCompare: --ignoreDuplicates given without any other read filter now also removes the duplicates from the number of mapped reads used by --normalizeUsing and --scaleFactorsMethod readCount
+
 3.5.5
 * drop support for python 3.7
 * doc fixes (argparse properly displayed, minor changes in installation instructions)

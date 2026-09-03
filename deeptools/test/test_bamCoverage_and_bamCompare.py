@@ -460,3 +460,18 @@ def test_bam_compare_filter_blacklist():
                     '3R\t1050\t1500\t0\n']
         assert f"{resp}" == f"{expected}", f"{resp} != {expected}"
         unlink(outfile)
+
+
+def test_get_num_kept_reads_ignore_duplicates():
+    """
+    --ignoreDuplicates on its own must reduce the number of reads used for
+    the normalisation, exactly as it does when another (no-op) filter is
+    also given. test_filtering.bam carries position duplicates.
+    """
+    args = bam_cov.process_args("--bam {} -o /tmp/test --ignoreDuplicates".format(BAMFILE_FILTER1).split())
+    kept_dup, total = gs.get_num_kept_reads(args, None)
+    args = bam_cov.process_args("--bam {} -o /tmp/test --ignoreDuplicates --samFlagExclude 4".format(BAMFILE_FILTER1).split())
+    kept_dup_and_noop, total2 = gs.get_num_kept_reads(args, None)
+    assert total == total2
+    assert kept_dup < total, "duplicates were not removed from the normalisation count"
+    assert abs(kept_dup - kept_dup_and_noop) < 1e-6, (kept_dup, kept_dup_and_noop)

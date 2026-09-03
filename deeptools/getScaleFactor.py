@@ -127,7 +127,8 @@ def fraction_kept(args, stats):
        (not args.samFlagInclude or args.samFlagInclude == 0) and \
        (not args.samFlagExclude or args.samFlagExclude == 0) and \
        (not args.minFragmentLength or args.minFragmentLength == 0) and \
-       (not args.maxFragmentLength or args.maxFragmentLength == 0):
+       (not args.maxFragmentLength or args.maxFragmentLength == 0) and \
+       not getattr(args, "ignoreDuplicates", False):
         if hasattr(args, "filterRNAstrand"):
             if args.filterRNAstrand not in ["forward", "reverse"]:
                 return 1.0
