@@ -1,3 +1,6 @@
+unreleased
+* bamCoverage --MNase: odd-length fragments contribute their three central bases (four, shifted, since the Python 3 port; issue #1118)
+
 3.5.5
 * drop support for python 3.7
 * doc fixes (argparse properly displayed, minor changes in installation instructions)

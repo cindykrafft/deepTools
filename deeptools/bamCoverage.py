@@ -405,12 +405,14 @@ class CenterFragment(writeBedGraph.WriteBedGraph):
         if read.is_proper_pair and not read.is_reverse and 1 < abs(read.tlen):
             # distance between pairs is even return two bases at the center
             if read.tlen % 2 == 0:
-                fragment_start = read.pos + read.tlen / 2 - 1
+                fragment_start = read.pos + read.tlen // 2 - 1
                 fragment_end = fragment_start + 2
 
             # distance is odd return three bases at the center
+            # (integer division: with Python 3's `/` the start was a
+            # half-integer and four bases were counted, issue #1118)
             else:
-                fragment_start = read.pos + read.tlen / 2 - 1
+                fragment_start = read.pos + read.tlen // 2 - 1
                 fragment_end = fragment_start + 3
 
         return [(fragment_start, fragment_end)]
