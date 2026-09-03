@@ -1,3 +1,6 @@
+unreleased
+* plotFingerprint: per-bin coverage sums no longer credit a fragment's last bin with a whole tile when the sampling step equals --binSize
+
 3.5.5
 * drop support for python 3.7
 * doc fixes (argparse properly displayed, minor changes in installation instructions)
