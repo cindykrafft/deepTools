@@ -104,7 +104,9 @@ def countFragmentsInRegions_worker(chrom, start, end,
             scores = []
             for exon in reg:
                 weights.append(exon[1] - exon[0])
-                score = bwh.stats(chrom, exon[0], exon[1])
+                # exact=True: the default answers from the bigWig zoom
+                # levels, whose records straddle the region boundaries
+                score = bwh.stats(chrom, exon[0], exon[1], exact=True)
 
                 if score is None or score == [None] or np.isnan(score[0]):
                     score = [np.nan]

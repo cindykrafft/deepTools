@@ -1,3 +1,6 @@
+unreleased
+* multiBigwigSummary: bin and region means are computed from the exact bigWig values instead of the zoom-level summaries
+
 3.5.5
 * drop support for python 3.7
 * doc fixes (argparse properly displayed, minor changes in installation instructions)
