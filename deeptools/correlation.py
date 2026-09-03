@@ -613,14 +613,15 @@ class Correlation:
             m = m[np.argpartition(rvs, -self.ntop)[-self.ntop:], :]
             rvs = rvs[np.argpartition(rvs, -self.ntop)[-self.ntop:]]
 
-        # log2 (if requested)
+        # log2 (if requested). This has to act on `m`, the (possibly
+        # row-filtered) matrix the SVD is computed from; rebinding
+        # self.matrix left the PCA unchanged.
         if self.log2:
-            self.matrix = np.log2(self.matrix + 0.01)
+            m = np.log2(m + 0.01)
 
         # Row center / transpose
         if self.rowCenter and not self.transpose:
-            _ = self.matrix.mean(axis=1)
-            self.matrix -= _[:, None]
+            m = m - m.mean(axis=1)[:, None]
         if self.transpose:
             m = m.T
 

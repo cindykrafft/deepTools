@@ -1,3 +1,6 @@
+unreleased
+* plotPCA: --log2 and --rowCenter now affect the computed PCA (they were applied to a copy of the matrix the SVD did not use)
+
 3.5.5
 * drop support for python 3.7
 * doc fixes (argparse properly displayed, minor changes in installation instructions)
