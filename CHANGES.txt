@@ -16,6 +16,7 @@
 * alignmentSieve output order matches input order exactly
 * --missingDataAsZero no longer takes bases exceeding chromosome bounds as 0 values but rather purges the bins
 * large scale values precision slightly altered with new backend (f32 vs f64)
+* bamCompare --skipZeroOverZero: a skipped bin between two bins of equal value is no longer written with that value when adjacent bins are collapsed; the output run stops at the gap (#1108, #1130)
 
 3.5.6
 * minimal supported python version raised to 3.9 (numpy >= 2 support); NaN handling switched to np.nan

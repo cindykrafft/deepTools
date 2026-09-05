@@ -606,3 +606,21 @@ def test_bam_compare_filter_blacklist():
         ]
         assert f"{resp}" == f"{expected}", f"{resp} != {expected}"
         unlink(outfile)
+
+
+def test_bam_compare_ZoverZ_interior_bins():
+    """
+    A bin skipped by --skipZeroOverZero must stay absent from the output even
+    when the bins on both sides of it carry the same value: test_filtering.bam
+    has no reads between positions 57 and 78, so with 10-bp bins the bin 60-70
+    is zero-over-zero, and a file compared with itself is 0 everywhere else.
+    The collapsed output must not bridge the gap (#1108, #1130).
+    """
+    _, outfile = tempfile.mkstemp(suffix=".bg")
+    args = "--bamfile1 {0} --bamfile2 {0} --outFileFormat bedgraph --scaleFactors 1:1 --operation subtract " \
+           "--binSize 10 --region 3R:0:200 -o {1} --skipZeroOverZero".format(BAMFILE_FILTER1, outfile).split()
+    bam_comp.main(args)
+    resp = open(outfile).readlines()
+    expected = ['3R\t0\t60\t0\n', '3R\t70\t200\t0\n']
+    assert f"{resp}" == f"{expected}", f"{resp} != {expected}"
+    unlink(outfile)

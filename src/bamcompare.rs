@@ -379,7 +379,10 @@ pub fn r_bamcompare(
 
     let lines: Box<dyn Iterator<Item = (String, Value)>> = if collapse {
         Box::new(raw_lines.coalesce(|p, c| {
-            if p.1.value == c.1.value && p.0 == c.0 {
+            // Merge equal neighbouring values only when the intervals touch:
+            // a bin removed by --skipZeroOverZero (or --skipNonCoveredRegions)
+            // must not be absorbed into the run around it (#1108, #1130).
+            if p.1.value == c.1.value && p.0 == c.0 && p.1.end == c.1.start {
                 Ok((
                     p.0,
                     Value {
