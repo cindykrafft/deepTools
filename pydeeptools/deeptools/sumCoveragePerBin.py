@@ -167,35 +167,16 @@ class SumCoveragePerBin(countReadsPerBin.CountReadsPerBin):
                         fragmentEnd = reg[0] + len(coverages) * tileSize
 
                     sIdx = vector_start + max((fragmentStart - reg[0]) // tileSize, 0)
-                    eIdx = vector_start + min(np.ceil(float(fragmentEnd - reg[0]) / tileSize).astype('int'), nRegBins)
-                    if eIdx >= len(coverages):
-                        eIdx = len(coverages) - 1
+                    eIdx = vector_start + min(int(np.ceil(float(fragmentEnd - reg[0]) / tileSize)), nRegBins)
                     if last_eIdx is not None:
                         sIdx = max(last_eIdx, sIdx)
                         if sIdx >= eIdx:
                             continue
 
-                    # First bin
-                    if fragmentEnd < reg[0] + (sIdx + 1) * tileSize:
-                        _ = fragmentEnd - fragmentStart
-                    else:
-                        _ = reg[0] + (sIdx + 1) * tileSize - fragmentStart
-                    if _ > tileSize:
-                        _ = tileSize
-                    coverages[sIdx] += _
-                    _ = sIdx + 1
-                    while _ < eIdx:
-                        coverages[_] += tileSize
-                        _ += 1
-                    while eIdx - sIdx >= nRegBins:
-                        eIdx -= 1
-                    if eIdx > sIdx:
-                        _ = fragmentEnd - (reg[0] + eIdx * tileSize)
-                        if _ > tileSize:
-                            _ = tileSize
-                        elif _ < 0:
-                            _ = 0
-                        coverages[eIdx] += _
+                    # add to every bin the number of its bases the fragment covers
+                    for binIdx in range(int(sIdx), int(eIdx)):
+                        binStart = reg[0] + (binIdx - vector_start) * tileSize
+                        coverages[binIdx] += min(fragmentEnd, binStart + tileSize) - max(fragmentStart, binStart)
                     last_eIdx = eIdx
 
                 c += 1
