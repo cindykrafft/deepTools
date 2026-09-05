@@ -121,7 +121,7 @@ def test_multiBigwigSummary_gtf():
     labels = resp['labels']
     nt.assert_equal(labels, ['test1.bw.bw', 'test1.bw.bw'])
     nt.assert_allclose(matrix, np.array([[27.475, 27.475],
-                                         [27.31248719, 27.31248719]]))
+                                         [27.80669351, 27.80669351]]))
     unlink(outfile)
 
 
@@ -136,3 +136,28 @@ def test_multiBigwigSummary_metagene():
     nt.assert_allclose(matrix, np.array([[20.28956028, 20.28956028],
                                          [22.1923501, 22.1923501]]))
     unlink(outfile)
+
+
+def test_multiBigwigSummary_bins_exact_mean():
+    """
+    Bin means must be the mean of the per-base values, not the zoom-level
+    summary (which covers the records overlapping the bin, whole).
+    """
+    import pyBigWig
+    bw = '/tmp/_test_zoom.bw'
+    rng = np.random.RandomState(0)
+    n = 400000
+    vals = rng.gamma(2.0, 1.0, n // 50).repeat(50)          # 50-bp steps, like a bamCoverage track
+    vals[100000:102000] += 40.0                              # a peak next to a bin boundary
+    fh = pyBigWig.open(bw, 'w')
+    fh.addHeader([('chr1', n)])
+    fh.addEntries(['chr1'] * (n // 50), list(range(0, n, 50)), ends=list(range(50, n + 1, 50)), values=[float(x) for x in vals[::50]])
+    fh.close()
+    outfile = '/tmp/_test_zoom.npz'
+    args = "bins -b {0} {0} --binSize 10000 -o {1}".format(bw, outfile).split()
+    bwCorr.main(args)
+    matrix = np.load(outfile)['matrix']
+    expected = vals.reshape(-1, 10000).mean(axis=1)
+    nt.assert_allclose(np.sort(matrix[:, 0]), np.sort(expected), rtol=1e-6)
+    unlink(outfile)
+    unlink(bw)

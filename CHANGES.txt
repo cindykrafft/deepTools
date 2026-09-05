@@ -16,6 +16,7 @@
 * alignmentSieve output order matches input order exactly
 * --missingDataAsZero no longer takes bases exceeding chromosome bounds as 0 values but rather purges the bins
 * large scale values precision slightly altered with new backend (f32 vs f64)
+* multiBigwigSummary: bin/region means are computed from the exact bigWig values (pyBigWig stats(exact=True)) instead of the zoom-level summaries, which on bamCoverage tracks were off by a median of 1-3 % and up to several-fold next to peaks for bins or regions of 1.3 kb and more
 
 3.5.6
 * minimal supported python version raised to 3.9 (numpy >= 2 support); NaN handling switched to np.nan
