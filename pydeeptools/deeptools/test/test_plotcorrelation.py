@@ -77,3 +77,19 @@ def test_correlation_plot_scatter_ggplot():
 
     res = compare_images(COR_PLOT_GG_2, out_png2_gg, 50)
     assert res is None, "Plots do not match"
+
+
+def test_get_outlier_indices_uses_median_absolute_deviation():
+    """--removeOutliers documents the median absolute deviation (MAD) rule with
+    a threshold of 200; get_outlier_indices scaled by median(|x|), the median
+    itself for counts, so nothing below ~300x the median was ever flagged."""
+    import numpy as np
+    import numpy.testing as nt
+    from deeptools.correlation import Correlation
+    rng = np.random.RandomState(1)
+    data = rng.poisson(100.0, 5000).astype(float)
+    data[[5, 700, 4200]] = 5000.0
+    # |x - median| / (1.4826 * MAD) with MAD ~ 7 flags the three planted bins;
+    # with median(|x|) in place of the MAD nothing below ~30,000 was flagged
+    nt.assert_equal(sorted(Correlation.get_outlier_indices(data)), [5, 700, 4200])
+    assert len(Correlation.get_outlier_indices(rng.poisson(100.0, 5000).astype(float))) == 0

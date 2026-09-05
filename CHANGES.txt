@@ -16,6 +16,7 @@
 * alignmentSieve output order matches input order exactly
 * --missingDataAsZero no longer takes bases exceeding chromosome bounds as 0 values but rather purges the bins
 * large scale values precision slightly altered with new backend (f32 vs f64)
+* plotCorrelation --removeOutliers now uses the median absolute deviation its help text names (median(|x - median|)) instead of median(|x|); bins more than 200 MADs from the median in every sample are removed, which the option never did for count data
 
 3.5.6
 * minimal supported python version raised to 3.9 (numpy >= 2 support); NaN handling switched to np.nan
