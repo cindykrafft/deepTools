@@ -164,3 +164,46 @@ class TestComputeMatrixOperations(object):
         expectedh = '10ea07d1aa58f44625abe2142ef76094'
         assert f'{h}' == f'{expectedh}'
         os.remove(oname)
+
+    def testsort_single_bed_keeps_the_matrix_group_label(self):
+        """
+        computeMatrixOperations sort on a single-BED matrix from the Rust
+        computeMatrix, whose one region group is named after the BED file
+        (the Python computeMatrix called it "genes"); the sort file is a
+        reordered copy under another name.
+        """
+        import deeptools.computeMatrix2 as cm
+        cmroot = os.path.dirname(os.path.abspath(__file__)) + "/test_data/test_computematrix/"
+        bed = cmroot + "input_computeMatrix_regions1.bed"
+        bw = cmroot + "input_computeMatrix_bw1.bw"
+        _, mat = tempfile.mkstemp(suffix=".mat.gz")
+        cm.main(["reference-point", "-R", bed, "-S", bw, "-b", "20", "-a", "20", "-o", mat, "-p", "1"])
+        f = gzip.GzipFile(mat)
+        d = getHeader(f)
+        names = [line.decode().split("\t")[3] for line in f]
+        f.close()
+        assert d["group_labels"] == ["input_computeMatrix_regions1"]
+
+        # the sort file: the regions in reverse order, without the duplicated
+        # name (cda9 twice; computeMatrix renames the second one cda9_r1)
+        lines, seen = [], set()
+        for line in open(bed):
+            name = line.split("\t")[3]
+            if not line.startswith(("#", "track")) and name not in seen:
+                lines.append(line)
+                seen.add(name)
+        _, reordered = tempfile.mkstemp(suffix=".bed", prefix="reordered_")
+        open(reordered, "w").writelines(lines[::-1])
+        _, out = tempfile.mkstemp(suffix=".mat.gz")
+        cmo.main(["sort", "-m", mat, "-R", reordered, "-o", out])
+        f = gzip.GzipFile(out)
+        d = getHeader(f)
+        sorted_names = [line.decode().split("\t")[3] for line in f]
+        f.close()
+        expected = [n for n in [line.split("\t")[3] for line in lines[::-1]] if n in names]
+        assert d["group_labels"] == ["input_computeMatrix_regions1"]
+        assert d["group_boundaries"] == [0, len(expected)]
+        assert sorted_names == expected
+        os.remove(mat)
+        os.remove(reordered)
+        os.remove(out)

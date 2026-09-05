@@ -697,7 +697,12 @@ def sortMatrix(hm, regionsFileName, transcriptID, transcript_id_designator, verb
     regions = []
     defaultGroup = None
     if len(regionsFileName) == 1:
+        # A single region file without group labels is one group. The Python
+        # computeMatrix called it "genes"; the Rust computeMatrix names it
+        # after the file, so take the matrix's own label when it has one group.
         defaultGroup = "genes"
+        if len(hm.parameters['group_labels']) == 1:
+            defaultGroup = hm.parameters['group_labels'][0]
     for fname in regionsFileName:
         fp = dti.openPossiblyCompressed(fname)
         line = dti.getNext(fp)
